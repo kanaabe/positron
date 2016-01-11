@@ -7,6 +7,7 @@ toggleScribePlaceholder = require '../../lib/toggle_scribe_placeholder.coffee'
 try
   Scribe = require 'scribe-editor'
   scribePluginSanitizer = require '../../lib/sanitizer.coffee'
+  scribePluginLinkTooltip = require 'scribe-plugin-enhanced-link-tooltip'
 
 module.exports = class EditLayout extends Backbone.View
 
@@ -54,6 +55,7 @@ module.exports = class EditLayout extends Backbone.View
         i: true
         br: true
         a: { href: true, target: '_blank' }
+    scribe.use scribePluginLinkTooltip()
     @toggleLeadParagraphPlaceholder()
 
   serialize: ->

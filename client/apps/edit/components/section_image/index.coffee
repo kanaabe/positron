@@ -25,10 +25,8 @@ module.exports = React.createClass
     progress: null
     caption: @props.section.get('caption')
 
-  componentDidMount: ->
-    @attachScribe()
-
   componentDidUpdate: ->
+    console.log 'trying to update'
     @attachScribe()
 
   onClickOff: ->
@@ -67,6 +65,7 @@ module.exports = React.createClass
     toggleScribePlaceholder @refs.editable.getDOMNode()
 
   onEditableKeyup: ->
+    console.log 'onEditableKeyup'
     toggleScribePlaceholder @refs.editable.getDOMNode()
     @setState caption: $(@refs.editable.getDOMNode()).html()
 
