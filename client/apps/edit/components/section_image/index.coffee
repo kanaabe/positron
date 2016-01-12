@@ -9,6 +9,7 @@ try
   scribePluginToolbar = require 'scribe-plugin-toolbar'
   scribePluginSanitizer = require '../../lib/sanitizer.coffee'
   scribePluginLinkTooltip = require 'scribe-plugin-enhanced-link-tooltip'
+  scribePluginKeyboardShortcuts = require 'scribe-plugin-keyboard-shortcuts'
 _ = require 'underscore'
 gemup = require 'gemup'
 React = require 'react'
@@ -18,6 +19,11 @@ icons = -> require('./icons.jade') arguments...
 { div, section, h1, h2, span, img, header, input, nav, a, button, p } = React.DOM
 { crop, resize, fill } = require('embedly-view-helpers')(sd.EMBEDLY_KEY)
 
+keyboardShortcutsMap =
+  bold: (e) -> e.metaKey and e.keyCode is 66
+  linkPrompt: (e) -> e.metaKey and not e.shiftKey and e.keyCode is 75
+  unlink: (e) -> e.metaKey and e.shiftKey and e.keyCode is 75
+
 module.exports = React.createClass
 
   getInitialState: ->
@@ -25,11 +31,10 @@ module.exports = React.createClass
     progress: null
     caption: @props.section.get('caption')
 
-  componentDidUpdate: ->
-    console.log 'trying to update'
+  componentDidMount: ->
     @attachScribe()
 
-  onClickOff: ->
+  saveSection: ->
     if @state.src
       @props.section.set url: @state.src, caption: @state.caption
     else
@@ -48,10 +53,9 @@ module.exports = React.createClass
         image.src = src
         image.onload = =>
           @setState src: src, progress: null
-          @onClickOff()
+          @saveSection()
 
   attachScribe: ->
-    return if @scribe? or not @props.editing
     @scribe = new Scribe @refs.editable.getDOMNode()
     @scribe.use scribePluginSanitizer {
       tags:
@@ -62,10 +66,10 @@ module.exports = React.createClass
     }
     @scribe.use scribePluginToolbar @refs.toolbar.getDOMNode()
     @scribe.use scribePluginLinkTooltip()
+    @scribe.use scribePluginKeyboardShortcuts keyboardShortcutsMap
     toggleScribePlaceholder @refs.editable.getDOMNode()
 
   onEditableKeyup: ->
-    console.log 'onEditableKeyup'
     toggleScribePlaceholder @refs.editable.getDOMNode()
     @setState caption: $(@refs.editable.getDOMNode()).html()
 
@@ -97,12 +101,13 @@ module.exports = React.createClass
                 __html: "&nbsp;" + $(icons()).filter('.link').html()
               disabled: if @state.caption then false else true
             }
-          div {
-            className: 'esi-caption bordered-input'
-            ref: 'editable'
-            onKeyUp: @onEditableKeyup
-            dangerouslySetInnerHTML: __html: @props.section.get('caption')
-          }
+          div { className: 'esi-editable-container' },
+            div {
+              className: 'esi-caption bordered-input'
+              ref: 'editable'
+              onKeyUp: @onEditableKeyup
+              dangerouslySetInnerHTML: __html: @props.section.get('caption')
+            }
       (
         if @state.progress
           div { className: 'upload-progress-container' },
