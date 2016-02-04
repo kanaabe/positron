@@ -45,6 +45,7 @@ module.exports = React.createClass
     @props.section.destroy() if $(@props.section.get('body')).text() is ''
 
   setBody: ->
+    console.log 'hereeee set body'
     @props.section.set body: $(@refs.editable.getDOMNode()).html()
 
   attachScribe: ->
@@ -69,6 +70,11 @@ module.exports = React.createClass
     @scribe.use scribePluginHeadingCommand(2)
     @scribe.use scribePluginHeadingCommand(3)
 
+  toggleDisabledKeys: ->
+    console.log 'here'
+    @refs.bold.getDOMNode().disabled = !@refs.h3.getDOMNode().disabled
+    @refs.italic.getDOMNode().disabled = !@refs.h3.getDOMNode().disabled
+
   render: ->
     div { className: 'edit-section-text-container' },
       nav {
@@ -79,16 +85,20 @@ module.exports = React.createClass
         button {
           'data-command-name': 'bold'
           dangerouslySetInnerHTML: __html: '&nbsp;'
+          ref: 'bold'
         }
         button {
           'data-command-name': 'italic'
           dangerouslySetInnerHTML: __html: '&nbsp;'
+          ref: 'italic'
         }
         button {
           'data-command-name': 'h2'
         }
         button {
           'data-command-name': 'h3'
+          onClick: @toggleDisabledKeys
+          ref: 'h3'
         }
         button {
           'data-command-name': 'insertOrderedList'
