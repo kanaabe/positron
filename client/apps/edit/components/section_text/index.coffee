@@ -45,7 +45,6 @@ module.exports = React.createClass
     @props.section.destroy() if $(@props.section.get('body')).text() is ''
 
   setBody: ->
-    console.log 'hereeee set body'
     @props.section.set body: $(@refs.editable.getDOMNode()).html()
 
   attachScribe: ->
@@ -70,10 +69,16 @@ module.exports = React.createClass
     @scribe.use scribePluginHeadingCommand(2)
     @scribe.use scribePluginHeadingCommand(3)
 
-  toggleDisabledKeys: ->
-    console.log 'here'
-    @refs.bold.getDOMNode().disabled = !@refs.h3.getDOMNode().disabled
-    @refs.italic.getDOMNode().disabled = !@refs.h3.getDOMNode().disabled
+  toggleDisabledKeys: (e) ->
+    e.preventDefault()
+    type = e.currentTarget.getAttribute('data-command-name')
+    if type is 'h3'
+      @refs.bold.getDOMNode().disabled = !@refs.h3.getDOMNode().disabled
+      @refs.italic.getDOMNode().disabled = !@refs.h3.getDOMNode().disabled
+    else if type is 'italic'
+      @refs.h3.getDOMNode().disabled = !@refs.italic.getDOMNode().disabled
+    else if type is 'bold'
+      @refs.h3.getDOMNode().disabled = !@refs.bold.getDOMNode().disabled
 
   render: ->
     div { className: 'edit-section-text-container' },
@@ -86,11 +91,13 @@ module.exports = React.createClass
           'data-command-name': 'bold'
           dangerouslySetInnerHTML: __html: '&nbsp;'
           ref: 'bold'
+          onClick: @toggleDisabledKeys
         }
         button {
           'data-command-name': 'italic'
           dangerouslySetInnerHTML: __html: '&nbsp;'
           ref: 'italic'
+          onClick: @toggleDisabledKeys
         }
         button {
           'data-command-name': 'h2'
