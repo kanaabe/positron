@@ -96,7 +96,7 @@ denormalizedArtwork = (->
     @object().meta(name: 'Toc').keys
       type: @string().valid('toc')
       links: @array().items(
-        @object().keys
+        @object().meta(name: 'Link').keys
           name: @string().allow('', null)
           value: @string().allow('', null)
       ).allow(null).default([])
@@ -110,7 +110,7 @@ denormalizedArtwork = (->
       items: @array().items [
         imageSection
         videoSection
-        @object().keys
+        @object().meta(name: 'SimpleArtwork').keys
           type: @string().valid('artwork')
           id: @string()
       ]
