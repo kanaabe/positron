@@ -20,7 +20,8 @@ module.exports = FilterSearch = React.createClass
     @engine.initialize()
 
   search: ->
-    @engine.get @refs.searchQuery.getDOMNode().value, ([total, count, results]) =>
+    term = @refs.searchQuery.getDOMNode().value
+    @engine.get term, ([total, count, results]) =>
       @props.searchResults results
 
   selected: (article) ->
@@ -36,8 +37,11 @@ module.exports = FilterSearch = React.createClass
           onKeyUp: @search
           ref: 'searchQuery'
         }
-      ArticleList {
-        articles: @props.articles
-        checkable: true
-        selected: @selected
-      }
+      if @props.articles.length
+        ArticleList {
+          articles: @props.articles
+          checkable: true
+          selected: @selected
+        }
+      else
+        div { className: 'filter-search__empty' }, "No Articles"
