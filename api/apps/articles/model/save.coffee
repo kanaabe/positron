@@ -250,15 +250,16 @@ getPartnerLink = (artwork) ->
 
 @sanitizeAndSave = (callback) => (err, article) =>
   return callback err if err
+  db.articles.save sanitize(typecastIds article), callback
   # Send new content call to Sailthru on any published article save
-  if article.published or article.scheduled_publish_at
-    article = setOnPublishFields article
-    @indexForSearch article
-    @sendArticleToSailthru article, =>
-      db.articles.save sanitize(typecastIds article), callback
-  else
-    @indexForSearch article
-    db.articles.save sanitize(typecastIds article), callback
+  # if article.published or article.scheduled_publish_at
+  #   article = setOnPublishFields article
+  #   @indexForSearch article
+  #   @sendArticleToSailthru article, =>
+  #     db.articles.save sanitize(typecastIds article), callback
+  # else
+  #   @indexForSearch article
+  #   db.articles.save sanitize(typecastIds article), callback
 
 # TODO: Create a Joi plugin for this https://github.com/hapijs/joi/issues/577
 sanitize = (article) ->

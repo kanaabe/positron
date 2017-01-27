@@ -97,6 +97,27 @@ Q = require 'bluebird-q'
       return callback err, [] if err
       return callback null, results
 
+@updateArticles = (callback) ->
+  db.articles.find { sections: $elemMatch: type: 'artworks' } , (err, articles) =>
+    return callback err, [] if err
+    return callback null, [] if articles.length is 0
+    async.map articles, (article, cb) =>
+      if article.sections
+        for section in article.sections when section.type is 'artworks'
+          if section?.artworks
+            for artwork in section.artworks
+              if artwork?.artist
+                artwork.artists = [artwork.artist]
+                console.log "Updating artist " + artwork.artists[0].name
+                delete artwork.artist
+                # console.log artwork
+          else
+            console.log 'something up with this one: ' + article.id
+      sanitizeAndSave(cb)(null, article)
+    , (err, results) ->
+      return callback err, [] if err
+      return callback null, results.length
+
 #
 # Destroy
 #
