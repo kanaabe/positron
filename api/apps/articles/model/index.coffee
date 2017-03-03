@@ -68,6 +68,19 @@ Q = require 'bluebird-q'
         else
           sanitizeAndSave(callback)(null, article)
 
+@saveSimple = (input, accessToken, callback) =>
+  console.log 'i am here in simpleSave'
+  return callback() unless input.id
+  db.articles.findOne { id: input.id } , (err, article) =>
+    return callback err if err
+    input = _.omit input, 'sections, hero_section', 'lead_paragraph'
+    article = _.extend article, input
+    console.log article
+    validate typecastIds(article), (err, input) =>
+      console.log err
+      return callback err if err
+      db.articles.save sanitizeAndSave(typecastIds article), callback
+
 @publishScheduledArticles = (callback) ->
   db.articles.find { scheduled_publish_at: { $lt: new Date } } , (err, articles) =>
     return callback err, [] if err

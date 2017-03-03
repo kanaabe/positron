@@ -9,3 +9,4 @@ app.get '/articles/:id', routes.find, routes.show
 app.post '/articles', setUser, authenticated, routes.restrictFeature, routes.create
 app.put '/articles/:id', setUser, authenticated, routes.find, routes.restrictFeature, routes.update
 app.delete '/articles/:id', setUser, authenticated, routes.find, routes.delete
+app.put '/simple/:id', setUser, authenticated, routes.restrictFeature, routes.updateSimple # add adminOnly

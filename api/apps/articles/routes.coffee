@@ -48,6 +48,15 @@ User = require '../users/model.coffee'
     return next err if err
     res.send present article
 
+# PUT /api/simple/:id
+@updateSimple = (req, res, next) ->
+  # data = _.extend(req.article, req.body)
+  req.body.id = req.params.id
+  Article.saveSimple req.body, req.user?.access_token, (err, article) ->
+    console.log err
+    return next err if err
+    res.send present article
+
 # DELETE /api/articles/:id
 @delete = (req, res, next) ->
   unless User.hasChannelAccess req.user, (req.article.channel_id or req.article.partner_channel_id)
