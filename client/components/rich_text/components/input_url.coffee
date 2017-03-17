@@ -9,7 +9,7 @@
 # }
 React = require 'react'
 { div, button, input } = React.DOM
-icons = -> require('../icons.jade') arguments...
+icons = -> require('../icons.pug') arguments...
 
 module.exports = React.createClass
   displayName: 'RichTextInputUrl'

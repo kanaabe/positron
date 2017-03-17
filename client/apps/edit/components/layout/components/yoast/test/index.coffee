@@ -11,7 +11,7 @@ describe 'YoastView', ->
 
   beforeEach (done) ->
     benv.setup =>
-      tmpl = resolve __dirname, '../yoast.jade'
+      tmpl = resolve __dirname, '../yoast.pug'
       locals = _.extend fixtures().locals,
         article: @article = new Article fixtures().articles
       benv.render tmpl, locals, =>

@@ -10,7 +10,7 @@ describe 'EditHeader', ->
 
   beforeEach (done) ->
     benv.setup =>
-      tmpl = resolve __dirname, '../index.jade'
+      tmpl = resolve __dirname, '../index.pug'
       benv.render tmpl, _.extend(fixtures().locals,
         article: @article = new Article fixtures().article
       ), =>

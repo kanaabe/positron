@@ -7,7 +7,7 @@ routes = require './routes'
 
 app = module.exports = express()
 app.set 'views', __dirname + '/components'
-app.set 'view engine', 'jade'
+app.set 'view engine', 'pug'
 
 app.get '/articles/new', routes.create
 app.get '/articles/:id/edit', routes.edit

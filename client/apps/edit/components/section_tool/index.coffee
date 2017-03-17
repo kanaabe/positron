@@ -5,7 +5,7 @@
 
 React = require 'react'
 sd = require('sharify').data
-icons = -> require('./icons.jade') arguments...
+icons = -> require('./icons.pug') arguments...
 { div, ul, li } = React.DOM
 User = require '../../../../models/user.coffee'
 Channel = require '../../../../models/channel.coffee'

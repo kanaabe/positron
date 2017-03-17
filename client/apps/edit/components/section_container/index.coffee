@@ -16,7 +16,7 @@ SectionImageSet = React.createFactory require '../section_image_set/index.coffee
 SectionImageCollection = React.createFactory require '../section_image_collection/index.coffee'
 SectionImage = React.createFactory require '../section_image/index.coffee'
 { div, nav, button } = React.DOM
-icons = -> require('./icons.jade') arguments...
+icons = -> require('./icons.pug') arguments...
 
 module.exports = React.createClass
   displayName: 'SectionContainer'

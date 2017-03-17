@@ -6,7 +6,7 @@ A simple paginated list where the list items have a thumbnail, title, and subtit
 
 Include the mixin and indicate arguments (currentPage, totalPages, items, paginationParams). `items` is an array of hashes that look like `{ imgSrc: '', title: '', subtitle: '', href: '' }`.
 
-````jade
+````pug
 include ../components/paginated_list/index
 
 +paginated-list(2, 10, articles.map(...), '?published=' + published + '&')

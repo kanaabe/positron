@@ -10,7 +10,7 @@ _ = require 'underscore'
 React = require 'react'
 { input, div, a, h1, h2 } = React.DOM
 moment = require 'moment'
-icons = -> require('./icons.jade') arguments...
+icons = -> require('./icons.pug') arguments...
 
 module.exports = React.createClass
   displayName: 'ArticleList'

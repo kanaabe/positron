@@ -6,11 +6,11 @@ _ = require 'underscore'
 sd = require('sharify').data
 debug = require('debug') 'client'
 fs = require 'fs'
-jade = require 'jade'
+pug = require 'pug'
 
 render = (req, res, locals) ->
-  res.send jade.compile(
-    fs.readFileSync(f = __dirname + '/page.jade'),
+  res.send pug.compile(
+    fs.readFileSync(f = __dirname + '/page.pug'),
     filename: f
     cache: true
   ) _.extend res.locals, locals, referrer: req.get('referrer')
@@ -22,7 +22,7 @@ errorHandler = (err, req, res, next) ->
 
 module.exports = (app) ->
   app.set 'views', __dirname
-  app.set 'view engine', 'jade'
+  app.set 'view engine', 'pug'
   app.get '*', (req, res, next) ->
     err = new Error "Page Not Found"
     err.status = 404

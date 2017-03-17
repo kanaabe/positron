@@ -9,7 +9,7 @@ sailthru = require('sailthru-client').createSailthruClient(SAILTHRU_KEY,SAILTHRU
 async = require 'async'
 debug = require('debug') 'api'
 request = require 'superagent'
-jade = require 'jade'
+pug = require 'pug'
 Article = require '../../../models/article.coffee'
 moment = require 'moment'
 particle = require 'particle'
@@ -43,7 +43,7 @@ postFacebookAPI = (article, cb) ->
   article = new Article cloneDeep article
   return cb() unless article.isEditorial()
   article.prepForInstant()
-  jade.renderFile 'api/apps/articles/components/instant_articles/index.jade',
+  pug.renderFile 'api/apps/articles/components/instant_articles/index.pug',
     {
       article: article
       forceUrl: FORCE_URL

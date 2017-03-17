@@ -12,7 +12,7 @@ describe 'EditLayout', ->
 
   beforeEach (done) ->
     benv.setup =>
-      tmpl = resolve __dirname, '../index.jade'
+      tmpl = resolve __dirname, '../index.pug'
       sd = _.extend fixtures().locals.sd,
         CURRENT_CHANNEL: @channel = new Channel fixtures().channels
       locals = _.extend fixtures().locals,

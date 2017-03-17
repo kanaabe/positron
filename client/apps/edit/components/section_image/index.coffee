@@ -14,7 +14,7 @@ gemup = require 'gemup'
 React = require 'react'
 toggleScribePlaceholder = require '../../lib/toggle_scribe_placeholder.coffee'
 sd = require('sharify').data
-icons = -> require('./icons.jade') arguments...
+icons = -> require('./icons.pug') arguments...
 { div, section, h1, h2, span, img, header, input, nav, a, button, p } = React.DOM
 { crop, resize, fill } = require '../../../../components/resizer/index.coffee'
 

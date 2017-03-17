@@ -2,7 +2,7 @@ _ = require 'underscore'
 Backbone = require 'backbone'
 gemup = require 'gemup'
 sd = require('sharify').data
-formTemplate = -> require('./form.jade') arguments...
+formTemplate = -> require('./form.pug') arguments...
 
 module.exports = class ImageVideoUploadForm extends Backbone.View
 

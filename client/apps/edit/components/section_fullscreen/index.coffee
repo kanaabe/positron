@@ -15,7 +15,7 @@ React = require 'react'
 toggleScribePlaceholder = require '../../lib/toggle_scribe_placeholder.coffee'
 sd = require('sharify').data
 { div, section, span, input, button, p, textarea, video, img } = React.DOM
-icons = -> require('./icons.jade') arguments...
+icons = -> require('./icons.pug') arguments...
 moment = require 'moment'
 
 keyboardShortcutsMap =

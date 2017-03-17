@@ -8,7 +8,7 @@ FilterSearch = React.createFactory require '../../../components/filter_search/in
 query = require '../query.coffee'
 sd = require('sharify').data
 request = require 'superagent'
-icons = -> require('../icons.jade') arguments...
+icons = -> require('../icons.pug') arguments...
 
 module.exports = ArticlesListView = React.createClass
   displayName: 'ArticlesListView'

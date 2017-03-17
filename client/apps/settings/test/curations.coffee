@@ -27,7 +27,7 @@ describe 'EditCuration', ->
       locals = _.extend(fixtures().locals,
         curation: @curation
       )
-      tmpl = resolve __dirname, '../templates/curations/curation_edit.jade'
+      tmpl = resolve __dirname, '../templates/curations/curation_edit.pug'
       benv.render tmpl, locals, =>
         { @CurationEditView } = mod = benv.requireWithJadeify(
           resolve(__dirname, '../client/curations'), []
