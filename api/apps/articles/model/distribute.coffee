@@ -41,7 +41,7 @@ cleanArticlesInSailthru = (slugs = []) =>
 
 postFacebookAPI = (article, cb) ->
   article = new Article cloneDeep article
-  return cb() unless article.isEditorial()
+  # return cb() unless article.isEditorial()
   article.prepForInstant()
   pug.renderFile 'api/apps/articles/components/instant_articles/index.pug',
     {
@@ -54,6 +54,7 @@ postFacebookAPI = (article, cb) ->
       particle: particle
     },
     (err, html) ->
+      console.log html
       request
         .post "https://graph.facebook.com/v2.7/#{FB_PAGE_ID}/instant_articles"
         .send
