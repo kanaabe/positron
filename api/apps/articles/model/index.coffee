@@ -163,5 +163,6 @@ typecastIds = (article) ->
     partner_channel_id: article.partner_channel_id.toString() if article.partner_channel_id
 
 # Util
-@backfillTags = (article, tags) ->
-  console.log tags
+@backfillTags = (article, cb) ->
+  console.log article
+  cb(article)

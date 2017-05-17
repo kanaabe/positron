@@ -30,6 +30,7 @@
     "cookie-parser": "^1.4.0",
     "cookie-session": "^1.2.0",
     "cors": "^2.7.1",
+    "csv": "^1.1.1",
     "debug": "^2.2.0",
     "draft-convert": "^1.4.2",
     "draft-js": "^0.10.0",
