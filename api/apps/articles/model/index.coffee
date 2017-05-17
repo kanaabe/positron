@@ -161,3 +161,7 @@ typecastIds = (article) ->
     super_article: if article.super_article?.related_articles then _.extend article.super_article, related_articles: article.super_article.related_articles.map(String) else {}
     channel_id: article.channel_id.toString() if article.channel_id
     partner_channel_id: article.partner_channel_id.toString() if article.partner_channel_id
+
+# Util
+@backfillTags = (article, tags) ->
+  console.log tags
