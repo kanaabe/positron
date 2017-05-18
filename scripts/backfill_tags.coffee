@@ -17,7 +17,6 @@ Article = require '../api/apps/articles/model/index.coffee'
 
 fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
   console.log err if err
-  # console.log result
   csv.parse result, (err, data) ->
     console.log err if err
     newData = data.map (row, i) ->
@@ -33,16 +32,14 @@ fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
         .replace('/edit', '')
 
       return {
-        topics: topics
-        internalTags: row[4]
-        verticals: row[2]
+        tags: topics
+        tracking_tags: row[4]
+        vertical: row[2]
         id: id
       }
-
-    cbs = newData.map (article) -> (cb) ->
-      Article.backfillTags article, (result) ->
-        cb(result)
-
-    async.series cbs, (err, result) ->
+    newData = _.compact newData
+    async.mapSeries newData, (article, callback) ->
+      Article.backfillTags article, callback
+    , (err, result) ->
       console.log err
-      console.log result
+      console.log "Completed updating " + result.length + " articles."

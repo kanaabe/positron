@@ -18,8 +18,8 @@ cloneDeep = require 'lodash.clonedeep'
 @distributeArticle = (article, cb) =>
   cleanArticlesInSailthru article.slugs
   async.parallel [
-    (callback) ->
-      postFacebookAPI article, callback
+    # (callback) ->
+    #   postFacebookAPI article, callback
     (callback) ->
       postSailthruAPI article, callback
   ], (err, results) ->
@@ -77,20 +77,20 @@ postSailthruAPI = (article, cb) ->
     thumb: url: crop(imageSrc, { width: 900, height: 530 } )
   html = if article.send_body then getTextSections(article) else ''
   sailthru.apiPost 'content',
-  url: "#{FORCE_URL}/article/#{_.last(article.slugs)}"
-  date: article.published_at
-  title: article.email_metadata?.headline
-  author: article.email_metadata?.author
-  tags: tags
-  images: images
-  spider: 0
-  vars:
-    credit_line: article.email_metadata?.credit_line
-    credit_url: article.email_metadata?.credit_url
-    html: html
-    custom_text: article.email_metadata?.custom_text
-    daily_email: article.daily_email
-    weekly_email: article.weekly_email
+    url: "#{FORCE_URL}/article/#{_.last(article.slugs)}"
+    date: article.published_at
+    title: article.email_metadata?.headline
+    author: article.email_metadata?.author
+    tags: tags
+    images: images
+    spider: 0
+    vars:
+      credit_line: article.email_metadata?.credit_line
+      credit_url: article.email_metadata?.credit_url
+      html: html
+      custom_text: article.email_metadata?.custom_text
+      daily_email: article.daily_email
+      weekly_email: article.weekly_email
   , (err, response) =>
     if err
       debug err

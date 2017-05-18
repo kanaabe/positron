@@ -164,5 +164,7 @@ typecastIds = (article) ->
 
 # Util
 @backfillTags = (article, cb) ->
-  console.log article
-  cb(article)
+  @find article.id, (err, result) ->
+    newArticle = _.extend result, article
+    console.log newArticle
+    cb null, article
