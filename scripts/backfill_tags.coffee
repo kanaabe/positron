@@ -31,15 +31,25 @@ fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
         .replace('https://writer.artsy.net/articles/', '')
         .replace('/edit', '')
 
+      getVerticalObject = (name) ->
+        switch name
+          when 'art' then name: 'Art', id: '591ea921faef6a3a8e7fe1ae'
+          when 'market' then name: 'Market', id: '591ea947faef6a3a8e7fe1af'
+          when 'visual culture' then name: 'Visual Culture', id: '591ea97afaef6a3a8e7fe1b0'
+          when 'creativity' then name: 'Creativity', id: '591eaa6bfaef6a3a8e7fe1b1'
+          when 'news' then name: 'News', id: '591eaa7dfaef6a3a8e7fe1b2'
+
       return {
-        tags: topics
-        tracking_tags: row[4]
-        vertical: row[2]
+        article:
+          tags: topics.split(',')
+          tracking_tags: row[4].split(',')
+          vertical: getVerticalObject row[2]
         id: id
       }
     newData = _.compact newData
     async.mapSeries newData, (article, callback) ->
       Article.backfillTags article, callback
     , (err, result) ->
+      console.log result
       console.log err
       console.log "Completed updating " + result.length + " articles."

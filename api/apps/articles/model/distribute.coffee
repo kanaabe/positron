@@ -16,7 +16,7 @@ particle = require 'particle'
 cloneDeep = require 'lodash.clonedeep'
 
 @distributeArticle = (article, cb) =>
-  cleanArticlesInSailthru article.slugs
+  # cleanArticlesInSailthru article.slugs
   async.parallel [
     # (callback) ->
     #   postFacebookAPI article, callback
