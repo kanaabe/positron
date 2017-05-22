@@ -70,7 +70,10 @@ postFacebookAPI = (article, cb) ->
 postSailthruAPI = (article, cb) ->
   tags = ['article']
   tags = tags.concat ['magazine'] if article.featured is true
+  tags = tags.concat article.tracking_tags if article.tracking_tags
+  tags = tags.concat article.vertical.name if article.vertical
   tags = tags.concat article.keywords
+  console.log tags
   imageSrc = article.email_metadata?.image_url
   images =
     full: url: crop(imageSrc, { width: 1200, height: 706 } )

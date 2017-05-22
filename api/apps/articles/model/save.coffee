@@ -116,7 +116,7 @@ removeStopWords = (title) ->
             .get("#{ARTSY_URL}/api/v1/partner/#{partnerId}")
             .set('X-Xapp-Token': artsyXapp)
             .end callback
-  async.parallel callbacks, (err, results) =>
+  async.series callbacks, (err, results) =>
     return cb(err) if err
     keywords = input.tags or []
     keywords = keywords.concat (res.body.name for res in results)
@@ -130,13 +130,11 @@ removeStopWords = (title) ->
   return callback err if err
   # Send new content call to Sailthru on any published article save
   if article.published or article.scheduled_publish_at
-    console.log 'sending to sailthru'
     article = setOnPublishFields article
     indexForSearch article
     distributeArticle article, =>
       db.articles.save sanitize(typecastIds article), callback
   else
-    console.log 'unpublished'
     indexForSearch article
     db.articles.save sanitize(typecastIds article), callback
 

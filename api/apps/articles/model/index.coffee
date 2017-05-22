@@ -165,6 +165,10 @@ typecastIds = (article) ->
 # Util
 @backfillTags = (article, cb) ->
   @find article.id, (err, result) ->
+    console.log err if err
     newArticle = _.extend result, article.article
-    console.log newArticle.id + ": " + newArticle.vertical?.name
-    sanitizeAndSave(cb)(null, newArticle)
+    console.log article.id + ": " + newArticle.vertical?.name
+    generateKeywords newArticle, result, (err, a) ->
+      console.log err if err
+      return cb err if err
+      sanitizeAndSave(cb)(null, a)

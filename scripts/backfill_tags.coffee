@@ -38,18 +38,23 @@ fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
           when 'visual culture' then name: 'Visual Culture', id: '591ea97afaef6a3a8e7fe1b0'
           when 'creativity' then name: 'Creativity', id: '591eaa6bfaef6a3a8e7fe1b1'
           when 'news' then name: 'News', id: '591eaa7dfaef6a3a8e7fe1b2'
-
-      return {
-        article:
-          tags: topics.split(',')
-          tracking_tags: row[4].split(',')
-          vertical: getVerticalObject row[2]
+          else null
+      tracking = if row[4].length then row[4].split(',') else []
+      tags = if topics.length then topics.split(',') else []
+      obj = {
         id: id
+        article:
+          tags: tags
+          tracking_tags: tracking
+          vertical: getVerticalObject row[2]
       }
+      # console.log obj
+      return obj
     newData = _.compact newData
     async.mapSeries newData, (article, callback) ->
       Article.backfillTags article, callback
     , (err, result) ->
-      console.log result
+      # console.log result
       console.log err
       console.log "Completed updating " + result.length + " articles."
+      process.exit()
