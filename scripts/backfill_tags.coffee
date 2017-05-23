@@ -15,7 +15,7 @@ switch process.env.NODE_ENV
 
 Article = require '../api/apps/articles/model/index.coffee'
 
-fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
+fs.readFile 'scripts/tmp/magazine_no_editors.csv', (err, result) ->
   console.log err if err
   csv.parse result, (err, data) ->
     console.log err if err
@@ -39,7 +39,9 @@ fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
           when 'creativity' then name: 'Creativity', id: '591eaa6bfaef6a3a8e7fe1b1'
           when 'news' then name: 'News', id: '591eaa7dfaef6a3a8e7fe1b2'
           else null
-      tracking = if row[4].length then row[4].split(',') else []
+
+      tracking = row[4]
+      tracking = if tracking.length then tracking.split(',') else []
       tags = if topics.length then topics.split(',') else []
       obj = {
         id: id
@@ -48,7 +50,6 @@ fs.readFile 'scripts/tmp/magazine.csv', (err, result) ->
           tracking_tags: tracking
           vertical: getVerticalObject row[2]
       }
-      # console.log obj
       return obj
     newData = _.compact newData
     async.mapSeries newData, (article, callback) ->

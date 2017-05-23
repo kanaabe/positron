@@ -20,16 +20,19 @@ cloneDeep = require 'lodash.clonedeep'
   async.parallel [
     # (callback) ->
     #   postFacebookAPI article, callback
+    (callback) =>
+      @deleteArticleFromSailthru article, callback
     (callback) ->
       postSailthruAPI article, callback
   ], (err, results) ->
     debug err if err
     cb(article)
 
-@deleteArticleFromSailthru = (slug, cb) =>
+@deleteArticleFromSailthru = (article, cb) =>
   sailthru.apiDelete 'content',
-    url: "#{FORCE_URL}/article/#{slug}"
+    url: "https://artsy.net/article/#{_.last(article.slugs)}"
   , (err, response) =>
+    console.log "https://artsy.net/article/#{_.last(article.slugs)}"
     debug err if err
     cb()
 
@@ -94,6 +97,7 @@ postSailthruAPI = (article, cb) ->
       daily_email: article.daily_email
       weekly_email: article.weekly_email
   , (err, response) =>
+    console.log response.content[0].url
     if err
       debug err
       return cb err
