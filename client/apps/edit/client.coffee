@@ -60,6 +60,7 @@ convertSections = (article, callback) ->
         else
           cb()
   , =>
+    convertAuthor(article)
     callback()
   )
 
@@ -118,3 +119,6 @@ convertArtworks = (section, callback) ->
     section.set image
     callback()
   )
+
+convertAuthor = (article) ->
+  article.set 'author', _.pick article.get('author'), 'id', 'name'
