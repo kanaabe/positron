@@ -124,25 +124,26 @@ removeStopWords = (title) ->
       for author in input.contributing_authors
         keywords.push author.name
     article.keywords = keywords[0..9]
+    console.log article.keywords
     cb(null, article)
 
 @sanitizeAndSave = (callback) => (err, article) =>
   return callback err if err
   # Send new content call to Sailthru on any published article save
-  # if article.published or article.scheduled_publish_at
-  #   article = setOnPublishFields article
-  #   distributeArticle article, =>
-  #     db.articles.save sanitize(typecastIds article), callback
-  # else
-  #   db.articles.save sanitize(typecastIds article), callback
+  if article.published or article.scheduled_publish_at
+    article = setOnPublishFields article
+    distributeArticle article, =>
+      db.articles.save sanitize(typecastIds article), callback
+  else
+    db.articles.save sanitize(typecastIds article), callback
 
   # Distribute only
-  if article.published or article.scheduled_publish_at
-    distributeArticle article, =>
-      callback()
-  else
-    console.log 'article is not published'
-    callback()
+  # if article.published or article.scheduled_publish_at
+  #   distributeArticle article, =>
+  #     callback()
+  # else
+  #   console.log 'article is not published'
+  #   callback()
 
 # TODO: Create a Joi plugin for this https://github.com/hapijs/joi/issues/577
 sanitize = (article) ->

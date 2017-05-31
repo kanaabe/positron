@@ -20,8 +20,8 @@ cloneDeep = require 'lodash.clonedeep'
   async.parallel [
     # (callback) ->
     #   postFacebookAPI article, callback
-    (callback) =>
-      @deleteArticleFromSailthru article, callback
+    # (callback) =>
+    #   @deleteArticleFromSailthru article, callback
     (callback) ->
       postSailthruAPI article, callback
   ], (err, results) ->

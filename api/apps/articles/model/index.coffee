@@ -166,12 +166,146 @@ typecastIds = (article) ->
 @backfillTags = (article, cb) ->
   @find article.id, (err, result) ->
     return cb err if err
+    return cb() unless result
     newArticle = _.extend result, article.article
     console.log article.id + ": " + newArticle.vertical?.name
 
-    # generateKeywords newArticle, result, (err, a) ->
-    #   return cb err if err
-    #   sanitizeAndSave(cb)(null, a)
+    generateKeywords newArticle, result, (err, a) ->
+      return cb err if err
+      sanitizeAndSave(cb)(null, a)
 
     # Save only
-    sanitizeAndSave(cb)(null, newArticle)
+    # sanitizeAndSave(cb)(null, newArticle)
+
+@removeTags = (cb) ->
+  master_topic_tags = [
+    "Art World",
+    "Art History",
+    "Artists",
+    "Collecting",
+    "Market Analysis",
+    "The Art Industry",
+    "Art Law",
+    "Photography",
+    "The Internet",
+    "Design",
+    "Innovation",
+    "Inspiration",
+    "Wellness",
+    "galleries",
+    "fairs",
+    "music",
+    "emerging artists",
+    "stories",
+    "technology",
+    "science",
+    "auctions",
+    "travel",
+    "education",
+    "identity",
+    "kids",
+    "food",
+    "environment",
+    "EIR",
+    "resources",
+    "China",
+    "architecture",
+    "politics",
+    "WOS",
+    "women",
+    "institutions",
+    "theft",
+    "influential",
+    "sales",
+    "fem",
+    "established artists"
+  ]
+  master_tracking_tags = [
+    "podcast",
+    "video",
+    "newsfeed",
+    "evergreen",
+    "features",
+    "explainers",
+    "profiles",
+    "reviews",
+    "guides",
+    "reports",
+    "interviews",
+    "op-eds",
+    "sponsored",
+    "IK",
+    "SI",
+    "TT",
+    "AF",
+    "AS",
+    "CL",
+    "AG",
+    "AC",
+    "MG",
+    "ne",
+    "lists",
+    "obituaries",
+    "T3",
+    "T2",
+    "T1",
+    "UBS",
+    "longform",
+    "videos",
+    "photo story",
+    "subscriber"
+  ]
+
+  db.articles.find {published_at: {$lt: new Date('2017-01-01')},channel_id: ObjectId("5759e3efb5989e6f98f77993")} , (err, articles) =>
+    console.log err
+    console.log articles.length
+    async.mapSeries articles, (article, cb2) =>
+      console.log "EDITING ARTICLE: " + article._id
+      if article.tags?.length > 0
+        tracking_tags = []
+        tags = []
+        save = false
+
+        if article.tracking_tags
+          tracking_tags = article.tracking_tags
+        else
+          save = true
+          article.tags.map (tag) ->
+            if tag is 'sub'
+              tracking_tags.push 'subscriber'
+            if tag in master_tracking_tags
+              tracking_tags.push tag
+
+        article.tags.map (tag) ->
+          if tag in master_topic_tags
+            tags.push tag
+          if tag in ['collecting', ' collecting']
+            tags.push 'Collecting'
+          if tag is 'history'
+            tags.push 'Art History'
+
+        if _.difference(article.tags, tags).length > 0
+          save = true
+
+        console.log 'Save article: ' + save
+
+        thrownAwayTags = _.difference article.tags, tracking_tags.concat(tags)
+        console.log thrownAwayTags if thrownAwayTags.length
+
+        newFields =
+          tracking_tags: tracking_tags
+          tags: tags
+        console.log newFields
+        newArticle = _.extend article, newFields
+        # save = false
+        if save
+          generateKeywords newArticle, article, (err, a) ->
+            return cb2 err if err
+            sanitizeAndSave(cb2)(null, a)
+        else
+          cb2()
+      else
+        # console.log 'no tags found for article: ' + article._id
+        return cb2()
+    , (err, results) ->
+      return cb err, results
