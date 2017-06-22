@@ -1,18 +1,10 @@
-{
-  SAILTHRU_KEY
-  SAILTHRU_SECRET
-  FORCE_URL
-  EDITORIAL_CHANNEL
-  FB_PAGE_ID
-  INSTANT_ARTICLE_ACCESS_TOKEN
-  GEMINI_CLOUDFRONT_URL
-  NODE_ENV
-  SEGMENT_WRITE_KEY_MICROGRAVITY
-} = process.env
 _ = require 'underscore'
 _s = require 'underscore.string'
 Backbone = require 'backbone'
 search = require '../../../lib/elasticsearch'
+{ SAILTHRU_KEY, SAILTHRU_SECRET, FORCE_URL, EDITORIAL_CHANNEL,
+  FB_PAGE_ID, INSTANT_ARTICLE_ACCESS_TOKEN, GEMINI_CLOUDFRONT_URL,
+  NODE_ENV, SEGMENT_WRITE_KEY_MICROGRAVITY } = process.env
 sailthru = require('sailthru-client').createSailthruClient(SAILTHRU_KEY,SAILTHRU_SECRET)
 async = require 'async'
 debug = require('debug') 'api'
@@ -133,7 +125,7 @@ postSailthruAPI = (article, cb) ->
       tags: tags
       body: sections and stripHtmlTags(sections.join(' ')) or ''
       image_url: crop(article.thumbnail_image, { width: 70, height: 70 })
-      search_boost: article.searchBoost
+      search_boost: new Article(cloneDeep article).searchBoost()
     , (error, response) ->
       console.log('ElasticsearchIndexingError: Article ' + article.id + ' : ' + error) if error
   )

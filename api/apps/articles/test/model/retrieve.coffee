@@ -7,6 +7,9 @@ gravity = require('antigravity').server
 app = require('express')()
 sinon = require 'sinon'
 _ = require 'underscore'
+Joi = require 'joi'
+Joi.objectId = require('joi-objectid') Joi
+schema = require '../../model/schema.coffee'
 { ObjectId } = require 'mongojs'
 
 describe 'Retrieve', ->
@@ -26,9 +29,23 @@ describe 'Retrieve', ->
 
   describe '#toQuery', ->
 
+<<<<<<< HEAD
     it 'aggregates the query for all_by_author', ->
       { query } = Retrieve.toQuery {
         all_by_author: ObjectId '5086df098523e60002000017'
+=======
+    it 'type casts ids', (done) ->
+      Retrieve.toQuery {
+        author_id: '5086df098523e60002000018'
+        published: true
+      }, (err, query) =>
+        query.author_id.should.containEql ObjectId '5086df098523e60002000018'
+        done()
+
+    it 'aggregates the query for all_by_author', (done) ->
+      Retrieve.toQuery {
+        all_by_author: '5086df098523e60002000017'
+>>>>>>> e47fe321250be31e6fdd380a547192231c2e5705
         published: true
       }
       query['$or'][0].author_id.should.containEql ObjectId '5086df098523e60002000017'
@@ -82,19 +99,35 @@ describe 'Retrieve', ->
       { query } = Retrieve.toQuery {
         fair_ids: ['5086df098523e60002000016','5086df098523e60002000015']
         published: true
+<<<<<<< HEAD
       }
       query.fair_ids['$elemMatch'].should.be.ok()
       query.fair_ids['$elemMatch']['$in'][0].should.containEql ObjectId '5086df098523e60002000016'
       query.fair_ids['$elemMatch']['$in'][1].should.containEql ObjectId '5086df098523e60002000015'
+=======
+      }, (err, query) =>
+        query.fair_ids['$elemMatch'].should.be.ok()
+        query.fair_ids['$elemMatch']['$in'][0].toString().should.equal '5086df098523e60002000016'
+        query.fair_ids['$elemMatch']['$in'][1].toString().should.equal '5086df098523e60002000015'
+        done()
+>>>>>>> e47fe321250be31e6fdd380a547192231c2e5705
 
     it 'finds articles by multiple ids', ->
       { query } = Retrieve.toQuery {
         ids: ['54276766fd4f50996aeca2b8', '54276766fd4f50996aeca2b7']
         published: true
+<<<<<<< HEAD
       }
       query._id['$in'].should.be.ok()
       query._id['$in'][0].should.containEql ObjectId '54276766fd4f50996aeca2b8'
       query._id['$in'][1].should.containEql ObjectId '54276766fd4f50996aeca2b7'
+=======
+      }, (err, query) =>
+        query._id['$in'].should.be.ok()
+        query._id['$in'][0].toString().should.equal '54276766fd4f50996aeca2b8'
+        query._id['$in'][1].toString().should.equal '54276766fd4f50996aeca2b7'
+        done()
+>>>>>>> e47fe321250be31e6fdd380a547192231c2e5705
 
     it 'finds scheduled articles', ->
       { query } = Retrieve.toQuery {
