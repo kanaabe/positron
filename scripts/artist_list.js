@@ -1,6 +1,5 @@
-module.exports = 
-
-ARTISTLIST = [
+module.exports = [
+  'marina abramović',
   'andy warhol',
   'robert rauschenberg',
   'ai weiwei',
@@ -46,7 +45,6 @@ ARTISTLIST = [
   'olafur eliasson',
   'katsu',
   'alex katz',
-  'marina abramović',
   'robert mapplethorpe',
   'mike kelley',
   'helen frankenthaler',
