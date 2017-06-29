@@ -100,3 +100,48 @@ describe 'init', ->
         name: 'Artsy Editorial'
       }
       done()
+
+describe 'init', ->
+
+  beforeEach (done) ->
+    global.Image = class Image
+      constructor: ->
+        setTimeout => @onerror()
+      onerror: ->
+    @article = fixtures().articles
+    benv.setup =>
+      benv.expose
+        _: require('underscore')
+        $: benv.require('jquery')
+        jQuery: benv.require('jquery')
+        sd: { ARTICLE: @article, CURRENT_CHANNEL: id: '456' }
+      window.jQuery = jQuery
+      @client = rewire '../client.coffee'
+      @client.__set__ 'EditLayout', @EditLayout = sinon.stub()
+      @client.__set__ 'EditHeader', @EditHeader = sinon.stub()
+      @client.__set__ 'EditAdmin', @EditAdmin = sinon.stub()
+      @client.__set__ 'EditDisplay', @EditDisplay = sinon.stub()
+      @client.__set__ 'ReactDOM', @ReactDOM = render: sinon.stub()
+      @client.__set__ 'sd', sd
+      done()
+
+  afterEach ->
+    benv.teardown()
+
+  it 'removes the image section if there is an error with the old image', (done) ->
+    @client.init()
+    _.defer =>
+      console.log @client.article.sections.at(1)
+      done()
+
+  it 'removes the artwork from the array if there is an error with an image', (done) ->
+    @client.init()
+    _.defer =>
+      @client.article.sections.models[3].get('images').length.should.equal 0
+      done()
+
+  it 'removes the image from the aw', (done) ->
+    @client.init()
+    _.defer =>
+      @client.article.sections.models[6].get('images')
+      done()

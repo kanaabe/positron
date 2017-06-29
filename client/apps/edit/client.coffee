@@ -44,7 +44,8 @@ convertSections = (article, callback) ->
           convertImageSet section, cb
         else
           cb()
-  , =>
+  , (err, results) =>
+    console.log err if err
     convertAuthor(article)
     callback()
   )
@@ -59,11 +60,13 @@ convertImageSet = (section, callback) ->
         image.height = img.height
         image.artists = [image.artist] if image.type is 'artwork'
         cb()
+      img.onerror = ->
+        cb {msg: 'Error converting. Please contact support with a link to the article.'}
   , =>
     callback()
   )
 
-convertImages = (section, callback) ->
+convertImages = (section, cb) ->
   img = new Image()
   img.src = section.get('url')
   img.onload = ->
@@ -80,7 +83,9 @@ convertImages = (section, callback) ->
     }
     section.clear()
     section.set image
-    callback()
+    cb()
+  img.onerror = ->
+    cb {msg: 'Error converting image. Please contact support with a link to the article.'}
 
 convertArtworks = (section, callback) ->
   images = []
@@ -94,6 +99,8 @@ convertArtworks = (section, callback) ->
         artwork.height = img.height
         images.push artwork
         cb()
+      img.onerror = ->
+        cb {msg: 'Error converting artwork. Please contact support with a link to the article.'}
   , =>
     image = {
       type: 'image_collection'

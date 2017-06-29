@@ -6,7 +6,6 @@ HeaderSection = React.createFactory require './sections/header/index.coffee'
 SectionList = React.createFactory require './section_list/index.coffee'
 { div, p, textarea } = React.DOM
 
-
 module.exports = React.createClass
   displayName: 'EditContent'
 
