@@ -85,6 +85,13 @@ async function airtableFetch (row) {
         })
       })
 
+    const removeRecord = (recordId) =>
+      new Promise((resolve, reject) => {
+        base('Archive').destroy(recordIds, (err, deletedRecord) => {
+          err ? reject(err) : resolve(deletedRecord)
+        })
+      })
+
     const createRecord = (row) =>
       new Promise((resolve, reject) => {
         base('Archive').create(rowValues(row, true), (err, record) => {
@@ -106,9 +113,31 @@ async function airtableFetch (row) {
       if (!(records && records[0].getId())) {
         return
       }
-      var recordId = records[0].getId()
-      const update = await updateRecord(recordId, row)
-      return update
+      // Remove duplicate records if there are multiple
+      if (records.length > 1) {
+        let rejectedRecords = []
+        let recordId
+        records.map((record) => {
+          if (record.get('Production').length > 0) {
+            console.log('i have a production link')
+            recordId = record.getId()
+          } else {
+            console.log('i do not have a production link')
+            rejectedRecords.push(record.getId())
+          }
+        })
+        if (!recordId) {
+          recordId = rejectedRecords.pop()
+        }
+        const removedId = await removeRecords(rejectedRecords)
+        const update = await updateRecord(recordId, row)
+        return update
+      } else {
+        // No duplicates, just update the record
+        var recordId = records[0].getId()
+        const update = await updateRecord(recordId, row)
+        return update
+      }
     }
   } catch (err) {
     console.log(err)
