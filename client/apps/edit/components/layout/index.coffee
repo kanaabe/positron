@@ -139,11 +139,11 @@ module.exports = class EditLayout extends Backbone.View
 
   getLinkableText: ->
     fullText = @getBodyText()
-    return fullText.match(/==(\S+.*?)==/ig)
+    fullText.match(/==(\S+[\w|\s]*?\S)==/ig)
 
-  autolinkText: =>
+  autolinkText: (evt) ->
+    $('#autolink-status').addClass('searching').html('Linking...')
     linkableText = @getLinkableText()
-    console.log linkableText
     async.mapSeries linkableText, (findText, cb) =>
       text = findText.split('==').join('')
       request
@@ -153,12 +153,20 @@ module.exports = class EditLayout extends Backbone.View
           if err or res.body.total_count < 1
             return @article.replaceLink(findText, text)
           result = res.body._embedded.results[0]
-          link = result._links.permalink.href
+          link = @findLinkFromResult(result)
           name = result.title
           newLink = @getNewLink(link, name)
           console.log newLink
           @article.replaceLink(findText, newLink)
           cb()
+    , =>
+      $('#autolink-status').removeClass('searching').html('Auto-Link')
+      @article.trigger 'change:autolink'
 
   getNewLink: (link, name) ->
     "<a href='#{link}'>#{name}</a>"
+
+  findLinkFromResult: (result) ->
+    switch result.type
+      when "profile" then result._links.permalink.href.replace('/profile', '')
+      else result._links.permalink.href

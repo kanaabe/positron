@@ -9,7 +9,8 @@ header#edit-header
     a#edit-publish.avant-garde-button( data-disabled='true' )
       = article.get('published') ? 'Unpublish' : 'Publish'
     if sd.CURRENT_CHANNEL.get('type') === 'editorial'
-      a#autolink-button.avant-garde-button Auto-Link
+      a#autolink-button.avant-garde-button
+        #autolink-status Auto-Link
   #edit-header-right
     span#edit-error.attention
     a#edit-delete.avant-garde-button Delete

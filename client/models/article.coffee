@@ -124,3 +124,4 @@ module.exports = class Article extends Backbone.Model
       if section.get('type') is 'text'
         text = section.get('body')
         section.set('body', text.replace(taggedText, link))
+        section.trigger 'change:autolink'
