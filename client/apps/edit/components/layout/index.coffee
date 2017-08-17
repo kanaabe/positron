@@ -143,6 +143,7 @@ module.exports = class EditLayout extends Backbone.View
 
   autolinkText: (evt) ->
     $('#autolink-status').addClass('searching').html('Linking...')
+    $('#edit-content__overlay').addClass('disabled')
     linkableText = @getLinkableText()
     searchTypes = ['artist', 'profile', 'show', 'gene']
     searchQueryParam = searchTypes.map((t) -> "type[]=#{t}").join("&")
@@ -158,12 +159,12 @@ module.exports = class EditLayout extends Backbone.View
           link = @findLinkFromResult(result)
           name = result.title
           newLink = @getNewLink(link, name)
-          console.log newLink
           @article.replaceLink(findText, newLink)
           cb()
     , =>
       $('#autolink-status').removeClass('searching').html('Auto-Link')
-      @article.trigger 'change:autolink'
+      $('#edit-content__overlay').removeClass('disabled')
+      @article.sections.trigger 'change:autolink'
 
   getNewLink: (link, name) ->
     "<a href='#{link}'>#{name}</a>"

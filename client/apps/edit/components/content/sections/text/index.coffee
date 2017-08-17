@@ -48,7 +48,7 @@ module.exports = React.createClass
     @hasFeatures = @hasFollow
 
   componentDidMount: ->
-    @props.section.on 'change:autolink', @editorStateFromProps
+    @props.sections.on 'change:autolink', @editorStateFromProps
     if @props.section.get('body')?.length
       @editorStateFromProps()
     else if @props.editing
