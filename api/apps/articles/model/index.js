@@ -197,21 +197,40 @@ export const getSuperArticleCount = (id) => {
   })
 }
 
-export const backfill = (article, callback) => {
+const fs = require('fs')
+export const backfill = (callback) => {
+  const authors = []
   db.articles.find({
     published: true,
     channel_id: ObjectId('5759e3efb5989e6f98f77993')
   }).toArray((err, articles) => {
     if (err) { return callback(err) }
     if (articles.length === 0) { return callback(null, []) }
+    console.log(articles.length)
     async.mapSeries(articles, (article, cb) => {
-      // Do article stuff
       // db.articles.save(article, cb)
-      console.log(article.id)
+      const lastText = article.sections[article.sections.length - 1]
+      if (lastText && lastText.body) {
+        if (lastText.body.match(/<p>—(.*?)<\/p>/)) {
+          authors.push(lastText.body.match(/<p>—(.*?)<\/p>/)[0])
+          // console.log(article.slugs[article.slugs.length - 1] + ':')
+          // console.log(lastText.body.match(/<p>—(.*?)<\/p>/)[0])
+        } else {
+          console.log('couldnt find a match')
+        }
+      } else {
+        console.log('could not find last text')
+      }
+      cb()
+    }, (err, results) => {
+      console.log(err)
+      const arr = _.uniq(_.compact(authors)).join('\n')
+      fs.writeFile('scripts/tmp/authors.txt', arr, (err) => {
+        if (err) { console.log(err) }
+        console.log('done here...')
+        if (err) { return callback(err, {}) }
+        callback(null, { completed: results.length })
+      })
     })
-  }, (err, results) => {
-    console.log('done here...')
-    if (err) { return callback(err, {}) }
-    callback(null, { completed: results.length })
   })
 }

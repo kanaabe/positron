@@ -13,7 +13,8 @@
     "test": "sh scripts/test.sh",
     "assets": "sh scripts/assets.sh",
     "deploy": "sh scripts/deploy.sh",
-    "mocha": "sh scripts/mocha.sh"
+    "mocha": "sh scripts/mocha.sh",
+    "task": "node -r coffee-script/register -r babel-core/register -r dotenv/config"
   },
   "dependencies": {
     "@artsy/express-reloadable": "^1.0.2",
@@ -25,7 +26,6 @@
     "artsy-newrelic": "git://github.com/artsy/artsy-newrelic.git",
     "artsy-xapp": "^1.0.4",
     "async": "^1.4.2",
-    "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
     "babel-plugin-inline-react-svg": "^0.4.0",
     "babel-plugin-module-resolver": "^2.7.1",
@@ -103,6 +103,7 @@
   },
   "devDependencies": {
     "antigravity": "git://github.com/artsy/antigravity.git",
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^7.2.3",
     "babel-jest": "^20.0.3",
     "babel-plugin-styled-components": "^1.1.7",
