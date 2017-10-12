@@ -196,3 +196,22 @@ export const getSuperArticleCount = (id) => {
     })
   })
 }
+
+export const backfill = (article, callback) => {
+  db.articles.find({
+    published: true,
+    channel_id: ObjectId('5759e3efb5989e6f98f77993')
+  }).toArray((err, articles) => {
+    if (err) { return callback(err) }
+    if (articles.length === 0) { return callback(null, []) }
+    async.mapSeries(articles, (article, cb) => {
+      // Do article stuff
+      // db.articles.save(article, cb)
+      console.log(article.id)
+    })
+  }, (err, results) => {
+    console.log('done here...')
+    if (err) { return callback(err, {}) }
+    callback(null, { completed: results.length })
+  })
+}
