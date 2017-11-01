@@ -197,7 +197,7 @@ export const getSuperArticleCount = (id) => {
   })
 }
 
-// const fs = require('fs')
+const fs = require('fs')
 const s = require('underscore.string')
 const Authors = require('api/apps/authors/model.coffee')
 
@@ -207,6 +207,8 @@ export const backfill = (callback) => {
     channel_id: ObjectId('5759e3efb5989e6f98f77993')
   }).toArray((err, articles) => {
     if (err) { return callback(err) }
+
+    const missingAuthors = []
 
     if (articles.length === 0) { return callback(null, []) }
 
@@ -221,15 +223,15 @@ export const backfill = (callback) => {
       console.log('---------------------')
       console.log(`Checking article: ${article.slugs[article.slugs.length - 1]}`)
 
-      const textSections = _.filter(article.sections, { type: 'text' })
+      const textSections = _.where(article.sections, { type: 'text' })
       const lastTextSection = textSections[textSections.length - 1]
       const secondToLastTextSection = textSections[textSections.length - 2]
 
       if (lastTextSection) {
         if (lastTextSection.body.match(/<p>—(.*?)<\/p>/)) {
           const authorByline = lastTextSection.body.match(/<p>—(.*?)<\/p>/)[0]
-          console.log(`Found an author - going to look for: ${authorByline}`)
-          
+          // console.log(`Found an author - going to look for: ${authorByline}`)
+
           // Strip em dash and all other stuff
           const author = s(authorByline).stripTags().replace(/&nbsp;/g, '').replace('—', '').clean().value()
           console.log(`Clean author name: ${author}`)
@@ -238,8 +240,48 @@ export const backfill = (callback) => {
           Authors.mongoFetch({q: author}, (err, { results }) => {
             if (err) { return cb(err) }
             if (results) {
-              console.log(results)
-              cb()
+              if (results.length) {
+                const id = results[0].id
+                article.author_ids = [ObjectId(id)]
+                console.log(article.author_ids)
+                db.articles.save(article, cb)
+              } else {
+                console.log('No Authors Returned')
+                const data = {
+                  article: `https://writer.artsy.net/articles/${article.slugs[article.slugs.length - 1]}/edit`,
+                  author
+                }
+                missingAuthors.push(data)
+                cb()
+              }
+            }
+          })
+        } else if (secondToLastTextSection && secondToLastTextSection.body.match(/<p>—(.*?)<\/p>/)) {
+          const authorByline = secondToLastTextSection.body.match(/<p>—(.*?)<\/p>/)[0]
+          // console.log(`Found an author [2] - going to look for: ${authorByline}`)
+
+          // Strip em dash and all other stuff
+          const author = s(authorByline).stripTags().replace(/&nbsp;/g, '').replace('—', '').clean().value()
+          console.log(`Clean author name: ${author}`)
+
+          // Look for match in Authors query
+          Authors.mongoFetch({ q: author }, (err, { results }) => {
+            if (err) { return cb(err) }
+            if (results) {
+              if (results.length) {
+                const id = results[0].id
+                article.author_ids = [ObjectId(id)]
+                console.log(article.author_ids)
+                db.articles.save(article, cb)
+              } else {
+                console.log('No Authors Returned')
+                const data = {
+                  article: `https://writer.artsy.net/articles/${article.slugs[article.slugs.length - 1]}/edit`,
+                  author
+                }
+                missingAuthors.push(data)
+                cb()
+              }
             }
           })
         } else {
@@ -252,15 +294,15 @@ export const backfill = (callback) => {
       }
     }, (err, results) => {
       console.log(err)
-      callback()
+
       // File Writing
-      // const arr = _.uniq(_.compact(authors)).join('\n')
-      // fs.writeFile('scripts/tmp/authors.txt', arr, (err) => {
-      //   if (err) { console.log(err) }
-      //   console.log('done here...')
-      //   if (err) { return callback(err, {}) }
-      //   callback(null, { completed: results.length })
-      // })
+      const str = JSON.stringify(missingAuthors)
+      fs.writeFile('scripts/tmp/missingAuthors.txt', str, (err) => {
+        if (err) { console.log(err) }
+        console.log('done here...')
+        if (err) { return callback(err, {}) }
+        callback(null, { completed: results.length })
+      })
     })
   })
 }
