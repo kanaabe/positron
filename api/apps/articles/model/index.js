@@ -197,40 +197,70 @@ export const getSuperArticleCount = (id) => {
   })
 }
 
-const fs = require('fs')
+// const fs = require('fs')
+const s = require('underscore.string')
+const Authors = require('api/apps/authors/model.coffee')
+
 export const backfill = (callback) => {
-  const authors = []
   db.articles.find({
     published: true,
     channel_id: ObjectId('5759e3efb5989e6f98f77993')
   }).toArray((err, articles) => {
     if (err) { return callback(err) }
+
     if (articles.length === 0) { return callback(null, []) }
-    console.log(articles.length)
+
+    console.log(`There are ${articles.length} articles to go through...`)
+
     async.mapSeries(articles, (article, cb) => {
-      // db.articles.save(article, cb)
-      const lastText = article.sections[article.sections.length - 1]
-      if (lastText && lastText.body) {
-        if (lastText.body.match(/<p>—(.*?)<\/p>/)) {
-          authors.push(lastText.body.match(/<p>—(.*?)<\/p>/)[0])
-          // console.log(article.slugs[article.slugs.length - 1] + ':')
-          // console.log(lastText.body.match(/<p>—(.*?)<\/p>/)[0])
+      console.log('---------------------')
+      console.log('---------------------')
+      console.log('---------------------')
+      console.log('---------------------')
+      console.log('---------------------')
+      console.log('---------------------')
+      console.log(`Checking article: ${article.slugs[article.slugs.length - 1]}`)
+
+      const textSections = _.filter(article.sections, { type: 'text' })
+      const lastTextSection = textSections[textSections.length - 1]
+      const secondToLastTextSection = textSections[textSections.length - 2]
+
+      if (lastTextSection) {
+        if (lastTextSection.body.match(/<p>—(.*?)<\/p>/)) {
+          const authorByline = lastTextSection.body.match(/<p>—(.*?)<\/p>/)[0]
+          console.log(`Found an author - going to look for: ${authorByline}`)
+          
+          // Strip em dash and all other stuff
+          const author = s(authorByline).stripTags().replace(/&nbsp;/g, '').replace('—', '').clean().value()
+          console.log(`Clean author name: ${author}`)
+
+          // Look for match in Authors query
+          Authors.mongoFetch({q: author}, (err, { results }) => {
+            if (err) { return cb(err) }
+            if (results) {
+              console.log(results)
+              cb()
+            }
+          })
         } else {
-          console.log('couldnt find a match')
+          console.log('Could not find an author')
+          cb()
         }
       } else {
-        console.log('could not find last text')
+        console.log('Could not find a text section')
+        cb()
       }
-      cb()
     }, (err, results) => {
       console.log(err)
-      const arr = _.uniq(_.compact(authors)).join('\n')
-      fs.writeFile('scripts/tmp/authors.txt', arr, (err) => {
-        if (err) { console.log(err) }
-        console.log('done here...')
-        if (err) { return callback(err, {}) }
-        callback(null, { completed: results.length })
-      })
+      callback()
+      // File Writing
+      // const arr = _.uniq(_.compact(authors)).join('\n')
+      // fs.writeFile('scripts/tmp/authors.txt', arr, (err) => {
+      //   if (err) { console.log(err) }
+      //   console.log('done here...')
+      //   if (err) { return callback(err, {}) }
+      //   callback(null, { completed: results.length })
+      // })
     })
   })
 }

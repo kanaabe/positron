@@ -47,7 +47,7 @@ Joi = require '../../lib/joi'
     query.name = { $regex: ///#{input.q}///i } if input.q and input.q.length
   cursor = db.authors
     .find(query)
-    .limit(input.limit)
+    .limit(input.limit or 10)
     .sort($natural: -1)
     .skip(input.offset or 0)
   async.parallel [
