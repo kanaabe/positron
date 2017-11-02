@@ -212,25 +212,55 @@ export const backfill = (callback) => {
     console.log(`There are ${articles.length} articles to go through...`)
 
     async.mapSeries(articles, (article, cb) => {
-      
       let resave = false
-      const newSections = article.sections.map((section) => {
-        if (section.type === 'text') {
-          if (section.body.match(/<p><br><\/p><p><br><\/p>/)) {
-            resave = true
-            console.log('BEFORE-----------------')
-            console.log(section.body)
-            section.body = section.body.replace(/<p><br><\/p><p><br><\/p>/g, '<p><br></p>')
-            console.log('AFTER------------------')
-            console.log(section.body)
-          }
-          return section
-        } else {
-          return section
+
+      const basicText = [
+        '58adcfbd2f576100116db86f',
+        '5899161089131c001122396c',
+        '585bf702eec5660011f983e7',
+        '5614478fb51644060020546a',
+        '554a9f15cebe5506004d455c',
+        '554a9f15cebe5506004d455c',
+        '559b1b2b5376100600ff0bc7',
+        '566f41135e8cd1060096c29b',
+        '5954212508f3ab00173d23f0',
+        '5978e6e74c20750017e55e46',
+        '56cc637409d5550600556b03',
+        '5600c9503bb90a06009518e0',
+        '5978e6e74c20750017e55e46',
+        '596cc8970d19fe00171a0084',
+        '56d4e895215a6b0600c5e7f6',
+        '566f2891bb32b30600b0cb1d',
+        '565deaffbb8d980600589da9',
+        '553e30f264c2ed06001a880e',
+        '552e8d31b63c46060080384a',
+        '5536b7662ac3060600ccd39d',
+        '55350e327340cd0600a0212d',
+        '5696770f9d721c0600720a52',
+        '58459e56104093001189a7d1',
+        '5846e1fdc137140011634711',
+        '566f41135e8cd1060096c29b',
+        '5846e12cc137140011634710',
+        '584b0ee3e751080011bc1ad5',
+        '5670592a8f2b3a0600fa9431',
+        '56705903d68cc60600d2fe67',
+        '566b428fda41120600c3e2d6',
+        '5669d52f7934dd060052250e',
+        '56705903d68cc60600d2fe67',
+        '566f41135e8cd1060096c29b'
+      ]
+
+      if (_.contains(basicText, article._id.toString())) {
+        console.log('Found a manual basic text header')
+        article.type = 'feature'
+        article.hero_section = {
+          type: 'basic',
+          url: ''
         }
-      })
-      
-      article.sections = newSections
+      }
+
+      if (article.hero_section) {
+      }
       
       if (resave) {
         console.log('---------------------')
@@ -252,15 +282,3 @@ export const backfill = (callback) => {
     })
   })
 }
-
-// H2/H3 ISSUE
-// if (section.body.match(/<h2><br><\/h2>/)) {
-//   console.log('updated and h2')
-//   resave = true
-//   section.body = section.body.replace(/<h2><br><\/h2>/g, '<p><br></p>')
-// }
-// if (section.body.match(/<h3><br><\/h3>/)) {
-//   resave = true
-//   console.log('updated and h3')
-//   section.body = section.body.replace(/<h3><br><\/h3>/g, '<p><br></p>')
-// }
