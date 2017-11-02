@@ -197,9 +197,8 @@ export const getSuperArticleCount = (id) => {
   })
 }
 
-const fs = require('fs')
+// const fs = require('fs')
 const s = require('underscore.string')
-const Authors = require('api/apps/authors/model.coffee')
 
 export const backfill = (callback) => {
   db.articles.find({
@@ -208,101 +207,60 @@ export const backfill = (callback) => {
   }).toArray((err, articles) => {
     if (err) { return callback(err) }
 
-    const missingAuthors = []
-
     if (articles.length === 0) { return callback(null, []) }
 
     console.log(`There are ${articles.length} articles to go through...`)
 
     async.mapSeries(articles, (article, cb) => {
-      console.log('---------------------')
-      console.log('---------------------')
-      console.log('---------------------')
-      console.log('---------------------')
-      console.log('---------------------')
-      console.log('---------------------')
-      console.log(`Checking article: ${article.slugs[article.slugs.length - 1]}`)
-
-      const textSections = _.where(article.sections, { type: 'text' })
-      const lastTextSection = textSections[textSections.length - 1]
-      const secondToLastTextSection = textSections[textSections.length - 2]
-
-      if (lastTextSection) {
-        if (lastTextSection.body.match(/<p>—(.*?)<\/p>/)) {
-          const authorByline = lastTextSection.body.match(/<p>—(.*?)<\/p>/)[0]
-          // console.log(`Found an author - going to look for: ${authorByline}`)
-
-          // Strip em dash and all other stuff
-          const author = s(authorByline).stripTags().replace(/&nbsp;/g, '').replace('—', '').clean().value()
-          console.log(`Clean author name: ${author}`)
-
-          // Look for match in Authors query
-          Authors.mongoFetch({q: author}, (err, { results }) => {
-            if (err) { return cb(err) }
-            if (results) {
-              if (results.length) {
-                const id = results[0].id
-                article.author_ids = [ObjectId(id)]
-                console.log(article.author_ids)
-                db.articles.save(article, cb)
-              } else {
-                console.log('No Authors Returned')
-                const data = {
-                  article: `https://writer.artsy.net/articles/${article.slugs[article.slugs.length - 1]}/edit`,
-                  author
-                }
-                missingAuthors.push(data)
-                cb()
-              }
-            }
-          })
-        } else if (secondToLastTextSection && secondToLastTextSection.body.match(/<p>—(.*?)<\/p>/)) {
-          const authorByline = secondToLastTextSection.body.match(/<p>—(.*?)<\/p>/)[0]
-          // console.log(`Found an author [2] - going to look for: ${authorByline}`)
-
-          // Strip em dash and all other stuff
-          const author = s(authorByline).stripTags().replace(/&nbsp;/g, '').replace('—', '').clean().value()
-          console.log(`Clean author name: ${author}`)
-
-          // Look for match in Authors query
-          Authors.mongoFetch({ q: author }, (err, { results }) => {
-            if (err) { return cb(err) }
-            if (results) {
-              if (results.length) {
-                const id = results[0].id
-                article.author_ids = [ObjectId(id)]
-                console.log(article.author_ids)
-                db.articles.save(article, cb)
-              } else {
-                console.log('No Authors Returned')
-                const data = {
-                  article: `https://writer.artsy.net/articles/${article.slugs[article.slugs.length - 1]}/edit`,
-                  author
-                }
-                missingAuthors.push(data)
-                cb()
-              }
-            }
-          })
+      
+      let resave = false
+      const newSections = article.sections.map((section) => {
+        if (section.type === 'text') {
+          if (section.body.match(/<p><br><\/p><p><br><\/p>/)) {
+            resave = true
+            console.log('BEFORE-----------------')
+            console.log(section.body)
+            section.body = section.body.replace(/<p><br><\/p><p><br><\/p>/g, '<p><br></p>')
+            console.log('AFTER------------------')
+            console.log(section.body)
+          }
+          return section
         } else {
-          console.log('Could not find an author')
-          cb()
+          return section
         }
+      })
+      
+      article.sections = newSections
+      
+      if (resave) {
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log(`Saving article: ${article.slugs[article.slugs.length - 1]}`)
+        // console.log(article.sections)
+        // cb()
+        db.articles.save(article, cb)
       } else {
-        console.log('Could not find a text section')
         cb()
       }
     }, (err, results) => {
-      console.log(err)
-
-      // File Writing
-      const str = JSON.stringify(missingAuthors)
-      fs.writeFile('scripts/tmp/missingAuthors.txt', str, (err) => {
-        if (err) { console.log(err) }
-        console.log('done here...')
-        if (err) { return callback(err, {}) }
-        callback(null, { completed: results.length })
-      })
+      console.log('DONE')
+      // console.log(err)
     })
   })
 }
+
+// H2/H3 ISSUE
+// if (section.body.match(/<h2><br><\/h2>/)) {
+//   console.log('updated and h2')
+//   resave = true
+//   section.body = section.body.replace(/<h2><br><\/h2>/g, '<p><br></p>')
+// }
+// if (section.body.match(/<h3><br><\/h3>/)) {
+//   resave = true
+//   console.log('updated and h3')
+//   section.body = section.body.replace(/<h3><br><\/h3>/g, '<p><br></p>')
+// }
