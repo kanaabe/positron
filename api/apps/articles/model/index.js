@@ -251,26 +251,41 @@ export const backfill = (callback) => {
       ]
 
       if (_.contains(basicText, article._id.toString())) {
+
         console.log('Found a manual basic text header')
-        article.type = 'feature'
+        article.layout = 'feature'
         article.hero_section = {
           type: 'basic',
           url: ''
         }
+        resave = true
+
+      } else if (article.hero_section && article.hero_section.type === 'video') {
+
+        console.log('Found a video hero')
+        article.layout = 'feature'
+        article.hero_section.type = 'basic'
+        resave = true
+
+      } else if (article.hero_section && article.hero_section.type === 'image') {
+
+        console.log('Found an image header. Should be standard.')
+        article.layout = 'standard'
+        article.hero_section = null
+        resave = true
+
       }
 
-      if (article.hero_section) {
-      }
-      
       if (resave) {
-        console.log('---------------------')
-        console.log('---------------------')
-        console.log('---------------------')
-        console.log('---------------------')
-        console.log('---------------------')
-        console.log('---------------------')
         console.log(`Saving article: ${article.slugs[article.slugs.length - 1]}`)
-        // console.log(article.sections)
+        console.log(article.layout)
+        console.log(article.hero_section)
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
+        console.log('---------------------')
         // cb()
         db.articles.save(article, cb)
       } else {
@@ -278,6 +293,7 @@ export const backfill = (callback) => {
       }
     }, (err, results) => {
       console.log('DONE')
+      callback()
       // console.log(err)
     })
   })
