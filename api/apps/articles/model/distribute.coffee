@@ -25,15 +25,15 @@ particle = require 'particle'
 { cloneDeep } = require 'lodash'
 
 @distributeArticle = (article, cb) ->
-  cleanArticlesInSailthru article.slugs
+  # cleanArticlesInSailthru article.slugs
   async.parallel [
     (callback) ->
       postFacebookAPI article, callback
-    (callback) ->
-      postSailthruAPI article, callback
+    # (callback) ->
+    #   postSailthruAPI article, callback
   ], (err, results) ->
     debug err if err
-    cb(article)
+    cb()
 
 @deleteArticleFromSailthru = (slug, cb) ->
   sailthru.apiDelete 'content',
@@ -65,15 +65,17 @@ postFacebookAPI = (article, cb) ->
         particle: particle
       },
       (err, html) ->
+        console.log(err)
         return cb() if err
         request
           .post "https://graph.facebook.com/v2.7/#{FB_PAGE_ID}/instant_articles"
           .send
             access_token: INSTANT_ARTICLE_ACCESS_TOKEN
-            development_mode: NODE_ENV isnt 'production'
-            published: NODE_ENV is 'production'
+            development_mode: false
+            published: true
             html_source: html
           .end (err, response) ->
+            console.log(err)
             return cb err if err
             cb response
 

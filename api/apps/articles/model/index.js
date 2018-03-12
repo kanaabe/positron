@@ -13,7 +13,10 @@ import moment from 'moment'
 const db = require('../../../lib/db.coffee')
 const { onPublish, generateSlugs, generateKeywords,
   sanitizeAndSave, onUnpublish } = require('./save.coffee')
-const { removeFromSearch, deleteArticleFromSailthru } = require('./distribute.coffee')
+const {
+  distributeArticle, removeFromSearch,
+  deleteArticleFromSailthru
+} = require('./distribute.coffee')
 
 //
 // Retrieval
@@ -262,11 +265,15 @@ export const getSuperArticleCount = (id) => {
 export const backfill = (callback) => {
   // Modify the query to match the articles that need backfilling
   const query = {
-    published: true
+    published: true,
+    channel_id: ObjectId('5759e3efb5989e6f98f77993'),
+    layout: {$in: ['standard', 'feature']},
+    published_at: {$lt: new Date("2017-12-13")}
   }
 
   db.articles
   .find(query)
+  .sort({published_at: -1})
   .toArray((err, articles) => {
     if (err) {
       return callback(err)
@@ -284,11 +291,13 @@ export const backfill = (callback) => {
       console.log('---------------------')
       console.log('---------------------')
       console.log(`Backfilling article: ${article.slugs[article.slugs.length - 1]}`)
-
+      console.log(`Published: ${article.published_at}`)
       /*
         Write backfill logic here. Make sure to callback with cb()
         eg: distributeArticle(article,cb)
       */
+      setTimeout(() => { distributeArticle(article, cb) }, 500)
+      // distributeArticle(article, cb)
     }, (err, results) => {
       console.log(err)
       callback()
